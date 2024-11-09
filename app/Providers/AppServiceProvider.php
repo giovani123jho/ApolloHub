@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Laravel\Fortify\Fortify;
+use App\Actions\Fortify\CreateNewUser;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Registra a classe CreateNewUser para o processo de criação de usuário
+        Fortify::createUsersUsing(CreateNewUser::class);
     }
 }
