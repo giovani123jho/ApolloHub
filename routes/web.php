@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyDashboardController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MentorDashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,6 +26,11 @@ Route::middleware('auth')->group(function () {
     
     // Rota específica do dashboard da empresa
     Route::get('/dashboard/company', [CompanyDashboardController::class, 'index'])->name('dashboard.company');
+
+
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/dashboard/mentor', [MentorDashboardController::class, 'index'])->name('dashboard.mentor');
+    });
 });
 
 require __DIR__.'/auth.php';
