@@ -1,16 +1,18 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserController; // Importar o UserController
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\CompanyDashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Rota principal do dashboard com middleware para redirecionar empresas
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'redirect.company'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -21,7 +23,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
     
-    // Aqui você pode adicionar mais rotas para listar, editar e excluir usuários conforme necessário
+    // Rota específica do dashboard da empresa
+    Route::get('/dashboard/company', [CompanyDashboardController::class, 'index'])->name('dashboard.company');
 });
 
 require __DIR__.'/auth.php';
