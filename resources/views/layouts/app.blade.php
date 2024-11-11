@@ -18,6 +18,16 @@
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             @include('layouts.navigation')
 
+            <!-- Link de Logout -->
+            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                Logout
+            </a>
+
+            <!-- Formulário de Logout (Escondido) -->
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
+
             <!-- Page Heading -->
             @isset($header)
                 <header class="bg-white dark:bg-gray-800 shadow">
