@@ -54,10 +54,9 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        // Outros middlewares
         'auth' => \App\Http\Middleware\Authenticate::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        // Registra o middleware personalizado
         'redirect.company' => \App\Http\Middleware\RedirectIfCompany::class,
+        'redirect.mentor' => \App\Http\Middleware\RedirectIfMentor::class,
     ];
 }

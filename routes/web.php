@@ -18,7 +18,7 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 // Rota para logout
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-// Rota principal do dashboard, sem o middleware de redirecionamento
+// Rota principal do dashboard para acesso geral, sem o middleware de redirecionamento
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -35,13 +35,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
     
     // Rota específica do dashboard da empresa com o middleware de redirecionamento
-    Route::get('/dashboard/company', [CompanyDashboardController::class, 'index'])
-        ->middleware('redirect.company')
-        ->name('dashboard.company');
+    Route::middleware(['redirect.company'])->group(function () {
+        Route::get('/dashboard/company', [CompanyDashboardController::class, 'index'])->name('dashboard.company');
+    });
 
-    // Rota específica do dashboard do mentor, sem o middleware de redirecionamento de empresa
-    Route::get('/dashboard/mentor', [MentorDashboardController::class, 'index'])
-        ->name('dashboard.mentor');
+    // Rota específica do dashboard do mentor com o middleware de redirecionamento de mentor
+    Route::middleware(['redirect.mentor'])->group(function () {
+        Route::get('/dashboard/mentor', [MentorDashboardController::class, 'index'])->name('dashboard.mentor');
+    });
 });
 
 // Inclui as rotas de autenticação padrão, se necessário
