@@ -13,7 +13,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Registra o binding para 'redirect.mentor'
+        $this->app->bind('redirect.mentor', function ($app) {
+            // Substitua 'MentorRedirectService' pela classe que você quer associar ao 'redirect.mentor'
+            return new \App\Services\redirect.mentor();
+        });
+
+        // Registra o binding para 'redirect.company'
+        $this->app->bind('redirect.company', function ($app) {
+            // Substitua 'CompanyRedirectService' pela classe que você quer associar ao 'redirect.company'
+            return new \App\Services\redirect.company();
+        });
     }
 
     /**
