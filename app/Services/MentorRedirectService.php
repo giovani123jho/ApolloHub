@@ -2,40 +2,34 @@
 
 namespace App\Services;
 
-class CompanyRedirectService
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+
+class MentorRedirectService
 {
-    /**
-     * Construtor da classe CompanyRedirectService
-     * Você pode injetar dependências aqui se necessário
-     */
-    public function __construct()
+    public function __invoke($request, $next)
     {
-        // Inicialização de propriedades ou dependências, se necessário
+        $mentorId = Auth::id();
+
+        if (!$this->hasAccess($mentorId)) {
+            return Redirect::route('no-access')->with('error', 'Acesso negado.');
+        }
+
+        return $next($request);
     }
 
-    /**
-     * Realiza o redirecionamento da empresa para uma página específica.
-     *
-     * @param int $companyId
-     * @return string
-     */
-    public function redirectToCompanyDashboard(int $companyId): string
+    public function redirectToMentorDashboard(int $mentorId)
     {
-        // Lógica para redirecionar a empresa
-        // Você pode alterar isso para fazer um redirecionamento real
-        return "Redirecionando a empresa de ID {$companyId} para o painel de controle.";
+        if (!$this->hasAccess($mentorId)) {
+            return Redirect::route('no-access')->with('error', 'Acesso negado.');
+        }
+
+        return Redirect::route('mentor.dashboard', ['id' => $mentorId]);
     }
 
-    /**
-     * Exemplo de verificação de permissão da empresa antes do redirecionamento.
-     *
-     * @param int $companyId
-     * @return bool
-     */
-    public function hasAccess(int $companyId): bool
+    public function hasAccess(int $mentorId): bool
     {
-        // Lógica para verificar se a empresa tem permissão para acessar um recurso
-        // Por exemplo, verificar em um banco de dados (lógica simulada)
-        return true; // Suponha que a empresa sempre tenha acesso (ajuste conforme necessário)
+        // Verifica se o usuário está autenticado e é um mentor
+        return Auth::check() && Auth::id() === $mentorId && Auth::user()->user_type === 'mentor';
     }
 }

@@ -2,40 +2,34 @@
 
 namespace App\Services;
 
-class MentorRedirectService
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+
+class CompanyRedirectService
 {
-    /**
-     * Construtor da classe MentorRedirectService
-     * Você pode injetar dependências aqui se necessário
-     */
-    public function __construct()
+    public function __invoke($request, $next)
     {
-        // Inicialização de propriedades ou dependências, se necessário
+        $companyId = Auth::id();
+
+        if (!$this->hasAccess($companyId)) {
+            return Redirect::route('no-access')->with('error', 'Acesso negado.');
+        }
+
+        return $next($request);
     }
 
-    /**
-     * Realiza o redirecionamento do mentor para uma página específica.
-     *
-     * @param int $mentorId
-     * @return string
-     */
-    public function redirectToMentorDashboard(int $mentorId): string
+    public function redirectToCompanyDashboard(int $companyId)
     {
-        // Lógica para redirecionar o mentor
-        // Você pode alterar isso para fazer um redirecionamento real
-        return "Redirecionando o mentor de ID {$mentorId} para o painel de controle.";
+        if (!$this->hasAccess($companyId)) {
+            return Redirect::route('no-access')->with('error', 'Acesso negado.');
+        }
+
+        return Redirect::route('dashboard.company', ['id' => $companyId]);
     }
 
-    /**
-     * Exemplo de verificação de permissão do mentor antes do redirecionamento.
-     *
-     * @param int $mentorId
-     * @return bool
-     */
-    public function hasAccess(int $mentorId): bool
+    public function hasAccess(int $companyId): bool
     {
-        // Lógica para verificar se o mentor tem permissão para acessar um recurso
-        // Por exemplo, verificar em um banco de dados (lógica simulada)
-        return true; // Suponha que o mentor sempre tenha acesso (ajuste conforme necessário)
+        // Verifica se o usuário está autenticado e é uma empresa
+        return Auth::check() && Auth::id() === $companyId && Auth::user()->user_type === 'empresa';
     }
 }

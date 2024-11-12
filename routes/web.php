@@ -45,5 +45,10 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+// Rota para página de acesso negado
+Route::get('/no-access', function () {
+    return view('no-access'); // Certifique-se de criar a view no-access.blade.php
+})->name('no-access');
+
 // Inclui as rotas de autenticação padrão, se necessário
 require __DIR__.'/auth.php';

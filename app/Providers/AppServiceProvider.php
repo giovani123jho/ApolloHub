@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Laravel\Fortify\Fortify;
-use App\Actions\Fortify\CreateNewUser;
+use App\Services\MentorRedirectService;
+use App\Services\CompanyRedirectService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,14 +15,12 @@ class AppServiceProvider extends ServiceProvider
     {
         // Registra o binding para 'redirect.mentor'
         $this->app->bind('redirect.mentor', function ($app) {
-            // Substitua 'MentorRedirectService' pela classe que você quer associar ao 'redirect.mentor'
-            return new \App\Services\redirect.mentor();
+            return new MentorRedirectService();
         });
 
         // Registra o binding para 'redirect.company'
         $this->app->bind('redirect.company', function ($app) {
-            // Substitua 'CompanyRedirectService' pela classe que você quer associar ao 'redirect.company'
-            return new \App\Services\redirect.company();
+            return new CompanyRedirectService();
         });
     }
 
@@ -31,7 +29,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Registra a classe CreateNewUser para o processo de criação de usuário
-        Fortify::createUsersUsing(CreateNewUser::class);
+        // Aqui você pode colocar outras configurações se necessário
     }
 }
