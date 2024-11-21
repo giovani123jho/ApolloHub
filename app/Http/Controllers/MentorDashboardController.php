@@ -8,10 +8,10 @@ class MentorDashboardController extends Controller
 {
     public function index()
     {
-        // Aqui você pode buscar as empresas ou qualquer dado relevante para o mentor
-        // Por exemplo, você poderia buscar todas as empresas
-        // $companies = Company::all();
+        // Obtém o mentor logado
+        $mentor = auth()->user();
 
-        return view('dashboard.mentor'); // Carrega a view do dashboard do mentor
+        // Retorna a view com os dados do mentor
+        return view('dashboard.mentor', compact('mentor'));
     }
 }

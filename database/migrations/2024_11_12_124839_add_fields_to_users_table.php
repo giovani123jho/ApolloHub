@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Remove o valor padrão e torna o campo obrigatório
-            $table->string('user_type')->nullable(false)->default(null)->change();
+            $table->string('profile_picture')->nullable(); // Caminho para a foto de perfil
+            $table->string('education')->nullable();       // Campo de formação
+            $table->string('linkedin_url')->nullable();    // Link para o LinkedIn
         });
     }
 
@@ -23,8 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('user_type')->default('empresa')->change();
+            $table->dropColumn(['profile_picture', 'education', 'linkedin_url']);
         });
     }
 };
-

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Remove o valor padrão e torna o campo obrigatório
-            $table->string('user_type')->nullable(false)->default(null)->change();
+            // Adicionar a coluna 'website' (opcional, após o campo 'email')
+            $table->string('website')->nullable()->after('email');
         });
     }
 
@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('user_type')->default('empresa')->change();
+            // Remover a coluna 'website' durante um rollback
+            $table->dropColumn('website');
         });
     }
 };
-

@@ -4,27 +4,29 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class AddDescriptionToUsersTable extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            // Remove o valor padrão e torna o campo obrigatório
-            $table->string('user_type')->nullable(false)->default(null)->change();
+            $table->string('description', 450)->nullable()->after('linkedin_url');
         });
     }
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('user_type')->default('empresa')->change();
+            $table->dropColumn('description');
         });
     }
-};
-
+}

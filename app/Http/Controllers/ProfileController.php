@@ -2,60 +2,173 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Show the form for editing the profile (generic).
      */
-    public function edit(Request $request): View
+    public function edit()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $user = Auth::user();
+        return view('profile.edit', compact('user'));
     }
 
     /**
-     * Update the user's profile information.
+     * Show the profile for companies.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function showCompanyProfile()
     {
-        $request->user()->fill($request->validated());
+        $user = Auth::user();
+        return view('profile.company', compact('user'));
+    }
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+    /**
+     * Show the profile for mentors.
+     */
+    public function showMentorProfile()
+    {
+        $user = Auth::user();
+        return view('profile.mentor', compact('user'));
+    }
+
+    /**
+     * Update the profile information (generic).
+     */
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'education' => 'nullable|string|max:255',
+            'linkedin_url' => 'nullable|url',
+            'description' => 'nullable|string|max:450', // Descrição genérica
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        // Atualizar a imagem de perfil
+        if ($request->hasFile('profile_picture')) {
+            if ($user->profile_picture) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+            $user->profile_picture = $request->file('profile_picture')->store('profile_pictures', 'public');
         }
 
-        $request->user()->save();
+        // Atualizar dados do usuário
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->education = $request->education;
+        $user->linkedin_url = $request->linkedin_url;
+        $user->description = $request->description;
+        $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        // Redirecionar para o perfil correto
+        if ($user->user_type === 'empresa') {
+            return Redirect::route('profile.company')->with('success', 'Perfil atualizado com sucesso.');
+        }
+
+        if ($user->user_type === 'mentor') {
+            return Redirect::route('profile.mentor')->with('success', 'Perfil atualizado com sucesso.');
+        }
+
+        return Redirect::route('profile.edit')->with('success', 'Perfil atualizado com sucesso.');
     }
 
     /**
-     * Delete the user's account.
+     * Update additional company information.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function updateCompanyProfile(Request $request)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        $user = Auth::user();
+
+        $request->validate([
+            'description' => 'nullable|string|max:450',
+            'website' => 'nullable|url',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $user = $request->user();
+        if ($request->hasFile('profile_picture')) {
+            if ($user->profile_picture) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+            $user->profile_picture = $request->file('profile_picture')->store('logos', 'public');
+        }
+
+        $user->description = $request->description;
+        $user->website = $request->website;
+        $user->save();
+
+        return Redirect::route('profile.company.edit')->with('success', 'Informações da empresa atualizadas com sucesso.');
+    }
+
+    /**
+     * Update the user's password.
+     */
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return Redirect::route('profile.edit')->withErrors(['current_password' => 'A senha atual não está correta.']);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('success', 'Senha atualizada com sucesso.');
+    }
+
+    /**
+     * Delete the user's account (generic).
+     */
+    public function destroy(Request $request)
+    {
+        $user = Auth::user();
 
         Auth::logout();
+
+        if ($user->profile_picture) {
+            Storage::disk('public')->delete($user->profile_picture);
+        }
 
         $user->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+        return Redirect::to('/')->with('success', 'Conta deletada com sucesso.');
+    }
+
+    /**
+     * Delete the company's account.
+     */
+    public function destroyCompanyProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        Auth::logout();
+
+        if ($user->profile_picture) {
+            Storage::disk('public')->delete($user->profile_picture);
+        }
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/')->with('success', 'Conta da empresa deletada com sucesso.');
     }
 }
