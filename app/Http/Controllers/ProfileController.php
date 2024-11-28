@@ -49,7 +49,8 @@ class ProfileController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'education' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|url',
-            'description' => 'nullable|string|max:450', // Descrição genérica
+            'description' => 'nullable|string|max:450',
+            'whatsapp_number' => 'nullable|string|max:15', // Validação para o número de WhatsApp
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
@@ -67,6 +68,7 @@ class ProfileController extends Controller
         $user->education = $request->education;
         $user->linkedin_url = $request->linkedin_url;
         $user->description = $request->description;
+        $user->whatsapp_number = $request->whatsapp_number; // Atualizar número de WhatsApp
         $user->save();
 
         // Redirecionar para o perfil correto
@@ -91,6 +93,7 @@ class ProfileController extends Controller
         $request->validate([
             'description' => 'nullable|string|max:450',
             'website' => 'nullable|url',
+            'whatsapp_number' => 'nullable|string|max:15', // Validação para WhatsApp
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -103,6 +106,7 @@ class ProfileController extends Controller
 
         $user->description = $request->description;
         $user->website = $request->website;
+        $user->whatsapp_number = $request->whatsapp_number; // Atualizar número de WhatsApp
         $user->save();
 
         return Redirect::route('profile.company.edit')->with('success', 'Informações da empresa atualizadas com sucesso.');

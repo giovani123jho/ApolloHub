@@ -42,6 +42,13 @@
             <input type="url" name="linkedin_url" id="linkedin_url" value="{{ auth()->user()->linkedin_url }}" class="w-full border-gray-300 rounded-md shadow-sm">
         </div>
 
+        <!-- Campo WhatsApp -->
+        <div class="mb-4">
+            <label for="whatsapp_number" class="block text-gray-700">Número do WhatsApp</label>
+            <input type="text" name="whatsapp_number" id="whatsapp_number" value="{{ auth()->user()->whatsapp_number }}" class="w-full border-gray-300 rounded-md shadow-sm">
+            <p class="text-gray-500 text-sm">Informe o número no formato internacional (Ex.: +5511999999999).</p>
+        </div>
+
         <!-- Botão Salvar -->
         <div class="flex justify-end">
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">

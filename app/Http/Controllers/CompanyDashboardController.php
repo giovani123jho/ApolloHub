@@ -2,21 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Mentorship;
 
 class CompanyDashboardController extends Controller
 {
-    /**
-     * Exibe o dashboard da empresa com a lista de mentores.
-     */
     public function index()
     {
-        // Recupera mentores com paginação e descrição preenchida
+        // Carregar os mentores
         $mentors = User::where('user_type', 'mentor')
-            ->whereNotNull('description') // Somente mentores com descrição
-            ->paginate(10); // Paginação com 10 mentores por página
+            ->select('id', 'name', 'description', 'profile_picture', 'linkedin_url')
+            ->get();
 
-        return view('dashboard.company', compact('mentors'));
+        // Carregar as mentorias solicitadas pela empresa autenticada
+        $mentorships = Mentorship::where('company_id', auth()->id())
+            ->with('mentor') // Carregar dados do mentor relacionado
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('dashboard.company', compact('mentors', 'mentorships'));
     }
 }

@@ -21,12 +21,20 @@
             <input type="email" name="email" id="email" value="{{ auth()->user()->email }}" class="w-full border-gray-300 rounded-md shadow-sm">
         </div>
 
+        <!-- Número de WhatsApp -->
+        <div class="mb-4">
+            <label for="whatsapp_number" class="block text-gray-700">WhatsApp</label>
+            <input type="text" name="whatsapp_number" id="whatsapp_number" value="{{ auth()->user()->whatsapp_number }}" 
+                placeholder="Digite o número com DDD (ex: +55 11 99999-9999)"
+                class="w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+
         <!-- Logo da Empresa -->
         <div class="mb-4">
             <label for="profile_picture" class="block text-gray-700">Logo da Empresa</label>
             <input type="file" name="profile_picture" id="profile_picture" class="w-full border-gray-300 rounded-md shadow-sm">
             @if(auth()->user()->profile_picture)
-                <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="Logo da Empresa" class="w-20 h-20 rounded-full mt-2">
+                <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="Logo da Empresa" class="w-20 h-20 mt-2">
             @endif
         </div>
 

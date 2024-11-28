@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyDashboardController;
 use App\Http\Controllers\MentorDashboardController;
+use App\Http\Controllers\MentorshipController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,12 +37,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/profile/company/edit', [ProfileController::class, 'editCompanyProfile'])->name('profile.company.edit');
         Route::patch('/profile/company', [ProfileController::class, 'updateCompanyProfile'])->name('profile.company.update');
         Route::delete('/profile/company', [ProfileController::class, 'destroyCompanyProfile'])->name('profile.company.destroy');
+
+        // Rota para solicitar mentoria
+        Route::post('/mentorships/request/{mentor}', [MentorshipController::class, 'request'])->name('mentorship.request');
     });
 
     // Rotas específicas para mentores
     Route::middleware(['redirect.mentor'])->group(function () {
         Route::get('/dashboard/mentor', [MentorDashboardController::class, 'index'])->name('dashboard.mentor');
         Route::get('/profile/mentor', [ProfileController::class, 'showMentorProfile'])->name('profile.mentor');
+
+        // Rotas para aceitar ou recusar mentorias
+        Route::patch('/mentorship/{id}/accept', [MentorshipController::class, 'accept'])->name('mentorship.accept');
+        Route::patch('/mentorship/{id}/reject', [MentorshipController::class, 'reject'])->name('mentorship.reject');
+
+        // Rota para visualizar mentorias aceitas
+        Route::get('/dashboard/mentor/accepted-mentorships', [MentorshipController::class, 'acceptedMentorships'])->name('mentorship.accepted');
     });
 
     // Gerenciamento de usuários (somente para administradores ou gestores)
