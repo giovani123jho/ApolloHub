@@ -9,11 +9,14 @@
     <title>{{ config('app.name', 'ApolloHub') }}</title>
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset('logo/apollohub.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('logo/icone.ico') }}" type="image/x-icon">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+    <!-- Swiper.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -44,18 +47,18 @@
             <nav class="flex items-center space-x-8">
                 @if(auth()->check())
                     @if (auth()->user()->user_type === 'empresa')
-                        <a href="{{ route('dashboard.company') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Dashboard</a>
+                        <a href="{{ route('dashboard.company') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Mentorias</a>
                         <a href="{{ route('profile.company') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Perfil</a>
                     @elseif (auth()->user()->user_type === 'mentor')
-                        <a href="{{ route('dashboard.mentor') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Dashboard</a>
+                        <a href="{{ route('dashboard.mentor') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Mentorias</a>
                         <a href="{{ route('profile.mentor') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Perfil</a>
                     @endif
                     <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
                        class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                        Logout
+                        Sair
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Login</a>
+                    <a href="{{ route('login') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Entrar</a>
                     <a href="{{ route('register') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Registrar</a>
                 @endif
             </nav>
@@ -82,5 +85,29 @@
             @yield('content')
         </main>
     </div>
+
+    <!-- Swiper.js JavaScript -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const swiper = new Swiper('.swiper', {
+                slidesPerView: 2, // Altere aqui para 2 slides por vez
+                spaceBetween: 30, // Espaçamento entre os slides
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                loop: true, // Ativa o loop infinito
+                autoplay: {
+                    delay: 3000, // Troca automática a cada 3 segundos
+                    disableOnInteraction: false,
+                },
+            });
+        });
+    </script>
 </body>
 </html>

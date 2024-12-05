@@ -41,11 +41,21 @@ class Mentorship extends Model
     }
 
     /**
+     * Relacionamento com os detalhes da mentoria.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function detail()
+    {
+        return $this->hasOne(MentorshipDetail::class, 'mentorship_id');
+    }
+
+    /**
      * Verificar se a mentoria está pendente.
      *
      * @return bool
      */
-    public function isPending()
+    public function isPending(): bool
     {
         return $this->status === 'pendente';
     }
@@ -55,7 +65,7 @@ class Mentorship extends Model
      *
      * @return bool
      */
-    public function isAccepted()
+    public function isAccepted(): bool
     {
         return $this->status === 'aceita';
     }
@@ -65,8 +75,23 @@ class Mentorship extends Model
      *
      * @return bool
      */
-    public function isRejected()
+    public function isRejected(): bool
     {
         return $this->status === 'recusada';
+    }
+
+    /**
+     * Obter o status formatado.
+     *
+     * @return string
+     */
+    public function getFormattedStatus(): string
+    {
+        return match ($this->status) {
+            'pendente' => 'Pendente',
+            'aceita' => 'Aceita',
+            'recusada' => 'Recusada',
+            default => 'Indefinido',
+        };
     }
 }

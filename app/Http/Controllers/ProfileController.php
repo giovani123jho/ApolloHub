@@ -29,6 +29,15 @@ class ProfileController extends Controller
     }
 
     /**
+     * Show the form for editing the company profile.
+     */
+    public function editCompanyProfile()
+    {
+        $user = Auth::user();
+        return view('profile.company', compact('user')); // Certifique-se que a view company.blade.php está correta
+    }
+
+    /**
      * Show the profile for mentors.
      */
     public function showMentorProfile()
@@ -50,7 +59,7 @@ class ProfileController extends Controller
             'education' => 'nullable|string|max:255',
             'linkedin_url' => 'nullable|url',
             'description' => 'nullable|string|max:450',
-            'whatsapp_number' => 'nullable|string|max:15', // Validação para o número de WhatsApp
+            'whatsapp_number' => 'nullable|string|max:15',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
@@ -68,7 +77,7 @@ class ProfileController extends Controller
         $user->education = $request->education;
         $user->linkedin_url = $request->linkedin_url;
         $user->description = $request->description;
-        $user->whatsapp_number = $request->whatsapp_number; // Atualizar número de WhatsApp
+        $user->whatsapp_number = $request->whatsapp_number;
         $user->save();
 
         // Redirecionar para o perfil correto
@@ -93,7 +102,7 @@ class ProfileController extends Controller
         $request->validate([
             'description' => 'nullable|string|max:450',
             'website' => 'nullable|url',
-            'whatsapp_number' => 'nullable|string|max:15', // Validação para WhatsApp
+            'whatsapp_number' => 'nullable|string|max:15',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -106,10 +115,10 @@ class ProfileController extends Controller
 
         $user->description = $request->description;
         $user->website = $request->website;
-        $user->whatsapp_number = $request->whatsapp_number; // Atualizar número de WhatsApp
+        $user->whatsapp_number = $request->whatsapp_number;
         $user->save();
 
-        return Redirect::route('profile.company.edit')->with('success', 'Informações da empresa atualizadas com sucesso.');
+        return Redirect::route('profile.company')->with('success', 'Informações da empresa atualizadas com sucesso.');
     }
 
     /**
@@ -176,3 +185,4 @@ class ProfileController extends Controller
         return Redirect::to('/')->with('success', 'Conta da empresa deletada com sucesso.');
     }
 }
+

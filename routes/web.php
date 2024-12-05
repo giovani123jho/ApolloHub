@@ -18,9 +18,7 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 // Rota principal do dashboard (visão geral)
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 
 // Grupo de rotas protegidas para usuários autenticados
 Route::middleware('auth')->group(function () {
@@ -32,7 +30,10 @@ Route::middleware('auth')->group(function () {
 
     // Rotas específicas para empresas
     Route::middleware(['redirect.company'])->group(function () {
+        // Dashboard da empresa com busca e filtros
         Route::get('/dashboard/company', [CompanyDashboardController::class, 'index'])->name('dashboard.company');
+        
+        // Perfil da empresa
         Route::get('/profile/company', [ProfileController::class, 'showCompanyProfile'])->name('profile.company');
         Route::get('/profile/company/edit', [ProfileController::class, 'editCompanyProfile'])->name('profile.company.edit');
         Route::patch('/profile/company', [ProfileController::class, 'updateCompanyProfile'])->name('profile.company.update');
@@ -44,7 +45,10 @@ Route::middleware('auth')->group(function () {
 
     // Rotas específicas para mentores
     Route::middleware(['redirect.mentor'])->group(function () {
+        // Dashboard do mentor
         Route::get('/dashboard/mentor', [MentorDashboardController::class, 'index'])->name('dashboard.mentor');
+        
+        // Perfil do mentor
         Route::get('/profile/mentor', [ProfileController::class, 'showMentorProfile'])->name('profile.mentor');
 
         // Rotas para aceitar ou recusar mentorias
@@ -53,6 +57,10 @@ Route::middleware('auth')->group(function () {
 
         // Rota para visualizar mentorias aceitas
         Route::get('/dashboard/mentor/accepted-mentorships', [MentorshipController::class, 'acceptedMentorships'])->name('mentorship.accepted');
+
+        // Rotas para preencher detalhes da mentoria
+        Route::get('/mentorships/{id}/edit-details', [MentorshipController::class, 'editDetails'])->name('mentorship.edit.details');
+        Route::post('/mentorships/{id}/update-details', [MentorshipController::class, 'updateDetails'])->name('mentorship.update.details');
     });
 
     // Gerenciamento de usuários (somente para administradores ou gestores)

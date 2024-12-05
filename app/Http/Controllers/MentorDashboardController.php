@@ -12,9 +12,9 @@ class MentorDashboardController extends Controller
         // Obter o ID do mentor autenticado
         $mentorId = auth()->id();
 
-        // Buscar as mentorias solicitadas para o mentor
+        // Buscar as mentorias solicitadas e aceitas para o mentor
         $mentorships = Mentorship::where('mentor_id', $mentorId)
-            ->with('company') // Carregar os dados da empresa relacionada
+            ->with(['company', 'detail']) // Carregar dados da empresa e detalhes da mentoria
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -22,4 +22,3 @@ class MentorDashboardController extends Controller
         return view('dashboard.mentor', compact('mentorships'));
     }
 }
-

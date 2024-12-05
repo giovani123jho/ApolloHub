@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Mentorship;
+use App\Models\MentorshipDetail;
 use App\Models\User;
 
 class MentorshipController extends Controller
@@ -13,14 +14,12 @@ class MentorshipController extends Controller
      */
     public function request(Request $request, $mentorId)
     {
-        // Verificar se o mentor existe e se é do tipo 'mentor'
         $mentor = User::find($mentorId);
 
         if (!$mentor || $mentor->user_type !== 'mentor') {
             return redirect()->back()->with('error', 'Mentor inválido.');
         }
 
-        // Verificar se já existe uma solicitação pendente entre a empresa e o mentor
         $existingMentorship = Mentorship::where('mentor_id', $mentorId)
             ->where('company_id', auth()->id())
             ->where('status', 'pendente')
@@ -30,11 +29,10 @@ class MentorshipController extends Controller
             return redirect()->back()->with('error', 'Já existe uma solicitação de mentoria pendente para este mentor.');
         }
 
-        // Criar a solicitação de mentoria
         Mentorship::create([
             'mentor_id' => $mentor->id,
-            'company_id' => auth()->id(), // ID da empresa autenticada
-            'status' => 'pendente', // Status inicial da solicitação
+            'company_id' => auth()->id(),
+            'status' => 'pendente',
         ]);
 
         return redirect()->back()->with('success', 'Solicitação de mentoria enviada com sucesso!');
@@ -47,16 +45,16 @@ class MentorshipController extends Controller
     {
         $mentorship = Mentorship::findOrFail($id);
 
-        // Verificar se o usuário autenticado é o mentor
         if ($mentorship->mentor_id !== auth()->id()) {
             return redirect()->back()->with('error', 'Você não tem permissão para aceitar esta mentoria.');
         }
 
-        // Atualizar o status para 'aceita'
         $mentorship->status = 'aceita';
         $mentorship->save();
 
-        return redirect()->route('dashboard.mentor')->with('success', 'Mentoria aceita com sucesso!');
+        // Redirecionar para o formulário de detalhes da mentoria
+        return redirect()->route('mentorship.edit.details', $mentorship->id)
+            ->with('success', 'Mentoria aceita! Preencha os detalhes da mentoria.');
     }
 
     /**
@@ -66,12 +64,10 @@ class MentorshipController extends Controller
     {
         $mentorship = Mentorship::findOrFail($id);
 
-        // Verificar se o usuário autenticado é o mentor
         if ($mentorship->mentor_id !== auth()->id()) {
             return redirect()->back()->with('error', 'Você não tem permissão para recusar esta mentoria.');
         }
 
-        // Atualizar o status para 'recusada'
         $mentorship->status = 'recusada';
         $mentorship->save();
 
@@ -88,10 +84,49 @@ class MentorshipController extends Controller
         $mentorships = Mentorship::where('mentor_id', $mentorId)
             ->where('status', 'aceita')
             ->with(['company' => function ($query) {
-                $query->select('id', 'name', 'email', 'whatsapp'); // Certifique-se de incluir o campo WhatsApp
+                $query->select('id', 'name', 'email', 'whatsapp_number');
             }])
             ->get();
 
         return view('mentor.accepted-mentorships', compact('mentorships'));
+    }
+
+    /**
+     * Exibir formulário para preencher os detalhes da mentoria.
+     */
+    public function editDetails($id)
+    {
+        $mentorship = Mentorship::with('detail')->findOrFail($id);
+
+        if ($mentorship->mentor_id !== auth()->id()) {
+            return redirect()->route('dashboard.mentor')->with('error', 'Você não tem permissão para acessar esta mentoria.');
+        }
+
+        return view('mentorships.edit-details', compact('mentorship'));
+    }
+
+    /**
+     * Atualizar os detalhes da mentoria.
+     */
+    public function updateDetails(Request $request, $id)
+    {
+        $mentorship = Mentorship::findOrFail($id);
+
+        if ($mentorship->mentor_id !== auth()->id()) {
+            return redirect()->route('dashboard.mentor')->with('error', 'Você não tem permissão para atualizar esta mentoria.');
+        }
+
+        $validatedData = $request->validate([
+            'content' => 'nullable|string|max:500',
+            'mentoring_date' => 'required|date',
+            'meeting_link' => 'nullable|url',
+        ]);
+
+        $mentorship->detail()->updateOrCreate(
+            ['mentorship_id' => $mentorship->id],
+            $validatedData
+        );
+
+        return redirect()->route('dashboard.mentor')->with('success', 'Detalhes da mentoria salvos com sucesso!');
     }
 }

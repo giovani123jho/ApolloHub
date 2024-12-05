@@ -10,9 +10,10 @@ class HomeController extends Controller
 {
     public function index(SymplaService $symplaService)
     {
-        // Buscar empresas incubadas
+        // Buscar empresas incubadas, ordenadas alfabeticamente
         $companies = User::where('user_type', 'empresa')
             ->select('name', 'description', 'profile_picture', 'website')
+            ->orderBy('name', 'asc') // Ordena alfabeticamente
             ->get();
 
         // Buscar eventos do Sympla
